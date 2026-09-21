@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="glass-card form-card profile-card">
+  <div class="profile-header">
+    <div class="avatar avatar-lg">{{ (user.full_name or 'A')[0]|upper }}</div>
+    <div>
+      <h3>{{ user.full_name }}</h3>
+      <p>@{{ user.username }}</p>
+    </div>
+  </div>
+
+  <form method="POST" class="js-validate">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="full_name">Full Name</label>
+        <input type="text" id="full_name" name="full_name" value="{{ user.full_name }}" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ user.email }}" required>
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" value="{{ user.username }}" disabled>
+      </div>
+      <div class="form-group">
+        <label>Member Since</label>
+        <input type="text" value="{{ user.created_at.strftime('%d %b %Y') }}" disabled>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

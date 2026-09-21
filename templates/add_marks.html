@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Add Marks{% endblock %}
+{% block page_title %}Add / Update Marks{% endblock %}
+
+{% block content %}
+<div class="glass-card form-card">
+  <form method="POST" id="marksForm" class="js-validate">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="student_id">Student *</label>
+        <select id="student_id" name="student_id" required>
+          <option value="">Select Student</option>
+          {% for s in students %}
+          <option value="{{ s.id }}">{{ s.name }} ({{ s.roll_number }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="subject_id">Subject *</label>
+        <select id="subject_id" name="subject_id" required>
+          <option value="">Select Subject</option>
+          {% for sub in subjects %}
+          <option value="{{ sub.id }}">{{ sub.name }} ({{ sub.code }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="internal">Internal Assessment (out of 20) *</label>
+        <input type="number" id="internal" name="internal" min="0" max="20" step="0.5" required value="0">
+      </div>
+      <div class="form-group">
+        <label for="mid_exam">Mid Examination (out of 30) *</label>
+        <input type="number" id="mid_exam" name="mid_exam" min="0" max="30" step="0.5" required value="0">
+      </div>
+      <div class="form-group">
+        <label for="final_exam">Final Examination (out of 50) *</label>
+        <input type="number" id="final_exam" name="final_exam" min="0" max="50" step="0.5" required value="0">
+      </div>
+    </div>
+
+    <div class="calc-preview glass-card">
+      <div><span id="calcTotal">0</span><p>Total (out of 100)</p></div>
+      <div><span id="calcPercentage">0%</span><p>Percentage</p></div>
+      <div><span id="calcGrade">-</span><p>Grade</p></div>
+      <div><span id="calcGpa">0</span><p>GPA</p></div>
+      <div><span id="calcStatus">-</span><p>Status</p></div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{{ url_for('marks') }}" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Marks</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const inputs = ['internal', 'mid_exam', 'final_exam'].map(id => document.getElementById(id));
+  const calcUrl = "{{ url_for('api_calculate_marks') }}";
+
+  async function recalc() {
+    const payload = {
+      internal: document.getElementById('internal').value || 0,
+      mid_exam: document.getElementById('mid_exam').value || 0,
+      final_exam: document.getElementById('final_exam').value || 0,
+    };
+    const res = await fetch(calcUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    document.getElementById('calcTotal').textContent = data.total;
+    document.getElementById('calcPercentage').textContent = data.percentage + '%';
+    document.getElementById('calcGrade').textContent = data.grade;
+    document.getElementById('calcGpa').textContent = data.gpa;
+    const statusEl = document.getElementById('calcStatus');
+    statusEl.textContent = data.status;
+    statusEl.style.color = data.status === 'Pass' ? 'var(--success)' : 'var(--danger)';
+  }
+  inputs.forEach(el => el.addEventListener('input', recalc));
+  recalc();
+});
+</script>
+{% endblock %}

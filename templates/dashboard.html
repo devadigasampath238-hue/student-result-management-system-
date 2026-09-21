@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="stat-grid">
+  <div class="stat-card glass-card stagger">
+    <div class="stat-icon icon-blue"><i class="fa-solid fa-users"></i></div>
+    <div><span class="stat-value" data-count="{{ total_students }}">0</span><p>Total Students</p></div>
+  </div>
+  <div class="stat-card glass-card stagger">
+    <div class="stat-icon icon-purple"><i class="fa-solid fa-book"></i></div>
+    <div><span class="stat-value" data-count="{{ total_subjects }}">0</span><p>Total Subjects</p></div>
+  </div>
+  <div class="stat-card glass-card stagger">
+    <div class="stat-icon icon-green"><i class="fa-solid fa-file-lines"></i></div>
+    <div><span class="stat-value" data-count="{{ total_results }}">0</span><p>Total Results</p></div>
+  </div>
+  <div class="stat-card glass-card stagger">
+    <div class="stat-icon icon-teal"><i class="fa-solid fa-percent"></i></div>
+    <div><span class="stat-value" data-count="{{ pass_percentage }}">0</span><p>Pass Percentage</p></div>
+  </div>
+  <div class="stat-card glass-card stagger">
+    <div class="stat-icon icon-red"><i class="fa-solid fa-circle-xmark"></i></div>
+    <div><span class="stat-value" data-count="{{ failed_students }}">0</span><p>Failed Students</p></div>
+  </div>
+  <div class="stat-card glass-card stagger">
+    <div class="stat-icon icon-gold"><i class="fa-solid fa-trophy"></i></div>
+    <div><span class="stat-value">{{ top_result.student.name if top_result else '—' }}</span><p>Top Rank Holder</p></div>
+  </div>
+  <div class="stat-card glass-card stagger">
+    <div class="stat-icon icon-orange"><i class="fa-solid fa-chart-simple"></i></div>
+    <div><span class="stat-value" data-count="{{ average_marks }}">0</span><p>Average Marks %</p></div>
+  </div>
+  <div class="stat-card glass-card stagger">
+    <div class="stat-icon icon-pink"><i class="fa-solid fa-clock-rotate-left"></i></div>
+    <div><span class="stat-value" data-count="{{ recent_marks|length }}">0</span><p>Recent Activity</p></div>
+  </div>
+</div>
+
+<div class="grid-2col">
+  <div class="glass-card chart-card">
+    <h3><i class="fa-solid fa-chart-column"></i> Subject-wise Averages</h3>
+    <canvas id="subjectChart" height="220"></canvas>
+  </div>
+  <div class="glass-card chart-card">
+    <h3><i class="fa-solid fa-chart-pie"></i> Grade Distribution</h3>
+    <canvas id="gradeChart" height="220"></canvas>
+  </div>
+</div>
+
+<div class="glass-card table-card">
+  <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</h3>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Student</th><th>Subject</th><th>Total</th><th>Grade</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for m in recent_marks %}
+        <tr>
+          <td>{{ m.student.name }}</td>
+          <td>{{ m.subject.name }}</td>
+          <td>{{ m.total }}</td>
+          <td><span class="badge badge-grade">{{ m.grade }}</span></td>
+          <td><span class="badge {{ 'badge-success' if m.status=='Pass' else 'badge-danger' }}">{{ m.status }}</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty-row">No activity yet. Add marks to get started.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  fetch("{{ url_for('api_subject_averages') }}").then(r => r.json()).then(d => {
+    new Chart(document.getElementById('subjectChart'), {
+      type: 'bar',
+      data: { labels: d.labels, datasets: [{ label: 'Average %', data: d.data,
+        backgroundColor: 'rgba(99,102,241,0.65)', borderRadius: 8 }] },
+      options: { responsive: true, plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, max: 100 } } }
+    });
+  });
+  fetch("{{ url_for('api_grade_distribution') }}").then(r => r.json()).then(d => {
+    new Chart(document.getElementById('gradeChart'), {
+      type: 'doughnut',
+      data: { labels: d.labels, datasets: [{ data: d.data,
+        backgroundColor: ['#6366f1','#8b5cf6','#22c55e','#14b8a6','#f59e0b','#f97316','#ef4444'] }] },
+      options: { responsive: true }
+    });
+  });
+});
+</script>
+{% endblock %}

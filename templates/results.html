@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% block page_title %}Results &amp; Rankings{% endblock %}
+
+{% block content %}
+<div class="toolbar glass-card">
+  <div class="input-icon search-box">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" id="resultsSearch" placeholder="Search by student name...">
+  </div>
+  <a href="{{ url_for('export_results_csv') }}" class="btn btn-secondary"><i class="fa-solid fa-file-export"></i> Export CSV</a>
+</div>
+
+<div class="glass-card table-card">
+  <div class="table-wrap">
+    <table class="data-table" id="resultsTable">
+      <thead>
+        <tr><th>Rank</th><th>Student</th><th>Roll No.</th><th>Semester</th><th>%</th><th>GPA</th><th>Grade</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        <tr>
+          <td>
+            {% if r.rank == 1 %}<span class="badge badge-gold"><i class="fa-solid fa-trophy"></i> 1</span>
+            {% else %}{{ r.rank }}{% endif %}
+          </td>
+          <td>{{ r.student.name }}</td>
+          <td>{{ r.student.roll_number }}</td>
+          <td>{{ r.semester }}</td>
+          <td>{{ r.percentage }}%</td>
+          <td>{{ r.gpa }}</td>
+          <td><span class="badge badge-grade">{{ r.overall_grade }}</span></td>
+          <td><span class="badge {{ 'badge-success' if r.overall_status=='Pass' else 'badge-danger' }}">{{ r.overall_status }}</span></td>
+          <td class="row-actions">
+            <a href="{{ url_for('report_card', student_id=r.student_id) }}" class="icon-btn small" title="Report Card"><i class="fa-solid fa-file-invoice"></i></a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="empty-row">No results generated yet. Add marks for students first.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

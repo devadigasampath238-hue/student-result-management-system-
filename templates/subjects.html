@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Subjects{% endblock %}
+{% block page_title %}Subjects{% endblock %}
+
+{% block content %}
+<div class="grid-2col-uneven">
+  <div class="glass-card form-card">
+    <h3><i class="fa-solid fa-plus"></i> Add Subject</h3>
+    <form method="POST" class="js-validate">
+      <div class="form-group">
+        <label for="code">Subject Code *</label>
+        <input type="text" id="code" name="code" required placeholder="e.g. CS301">
+      </div>
+      <div class="form-group">
+        <label for="name">Subject Name *</label>
+        <input type="text" id="name" name="name" required placeholder="e.g. Data Structures">
+      </div>
+      <div class="form-group">
+        <label for="department">Department *</label>
+        <select id="department" name="department" required>
+          <option value="">Select Department</option>
+          <option>Computer Science</option>
+          <option>Electronics</option>
+          <option>Mechanical</option>
+          <option>Civil</option>
+          <option>Information Science</option>
+          <option>Electrical</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="semester">Semester *</label>
+        <select id="semester" name="semester" required>
+          <option value="">Select Semester</option>
+          {% for i in range(1, 9) %}
+          <option value="Semester {{ i }}">Semester {{ i }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="max_marks">Max Marks</label>
+        <input type="number" id="max_marks" name="max_marks" value="100">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-floppy-disk"></i> Save Subject</button>
+    </form>
+  </div>
+
+  <div class="glass-card table-card">
+    <h3><i class="fa-solid fa-list"></i> All Subjects</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Code</th><th>Name</th><th>Department</th><th>Semester</th><th>Max</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for s in subjects %}
+          <tr>
+            <td><code>{{ s.code }}</code></td>
+            <td>{{ s.name }}</td>
+            <td>{{ s.department }}</td>
+            <td>{{ s.semester }}</td>
+            <td>{{ s.max_marks }}</td>
+            <td class="row-actions">
+              <form method="POST" action="{{ url_for('delete_subject', sub_id=s.id) }}" class="inline-form confirm-delete">
+                <button type="submit" class="icon-btn small danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="empty-row">No subjects added yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

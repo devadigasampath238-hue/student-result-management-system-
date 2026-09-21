@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Marks{% endblock %}
+{% block page_title %}Marks Management{% endblock %}
+
+{% block content %}
+<div class="toolbar glass-card">
+  <div class="input-icon search-box">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" id="marksSearch" placeholder="Search by student or subject...">
+  </div>
+  <a href="{{ url_for('add_marks') }}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Marks</a>
+</div>
+
+<div class="glass-card table-card">
+  <div class="table-wrap">
+    <table class="data-table" id="marksTable">
+      <thead>
+        <tr>
+          <th>Student</th><th>Subject</th><th>Internal</th><th>Mid</th><th>Final</th>
+          <th>Total</th><th>%</th><th>Grade</th><th>GPA</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in marks_list %}
+        <tr>
+          <td>{{ m.student.name }}</td>
+          <td>{{ m.subject.name }}</td>
+          <td>{{ m.internal }}</td>
+          <td>{{ m.mid_exam }}</td>
+          <td>{{ m.final_exam }}</td>
+          <td><strong>{{ m.total }}</strong></td>
+          <td>{{ m.percentage }}%</td>
+          <td><span class="badge badge-grade">{{ m.grade }}</span></td>
+          <td>{{ m.gpa }}</td>
+          <td><span class="badge {{ 'badge-success' if m.status=='Pass' else 'badge-danger' }}">{{ m.status }}</span></td>
+          <td class="row-actions">
+            <form method="POST" action="{{ url_for('delete_marks', mark_id=m.id) }}" class="inline-form confirm-delete">
+              <button type="submit" class="icon-btn small danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="11" class="empty-row">No marks recorded yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

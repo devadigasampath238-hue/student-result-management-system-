@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Edit Student{% endblock %}
+{% block page_title %}Edit Student — {{ student.name }}{% endblock %}
+
+{% block content %}
+<div class="glass-card form-card">
+  <div class="edit-photo-preview">
+    <img src="{{ url_for('static', filename='images/students/' ~ student.photo) }}"
+         onerror="this.src='{{ url_for('static', filename='images/default.png') }}'" alt="{{ student.name }}">
+    <div>
+      <h3>{{ student.name }}</h3>
+      <p><code>{{ student.student_id }}</code> &middot; Roll No. {{ student.roll_number }}</p>
+    </div>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data" class="js-validate">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="name">Full Name *</label>
+        <input type="text" id="name" name="name" required value="{{ student.name }}">
+      </div>
+      <div class="form-group">
+        <label>Roll Number</label>
+        <input type="text" value="{{ student.roll_number }}" disabled>
+      </div>
+      <div class="form-group">
+        <label for="department">Department *</label>
+        <select id="department" name="department" required>
+          {% for d in ['Computer Science','Electronics','Mechanical','Civil','Information Science','Electrical'] %}
+          <option {{ 'selected' if d == student.department }}>{{ d }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="semester">Semester *</label>
+        <select id="semester" name="semester" required>
+          {% for i in range(1, 9) %}
+          <option value="Semester {{ i }}" {{ 'selected' if student.semester == 'Semester ' ~ i }}>Semester {{ i }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="section">Section</label>
+        <input type="text" id="section" name="section" value="{{ student.section or '' }}">
+      </div>
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <select id="gender" name="gender">
+          {% for g in ['','Male','Female','Other'] %}
+          <option value="{{ g }}" {{ 'selected' if g == student.gender }}>{{ g or 'Select' }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ student.email or '' }}">
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" name="phone" value="{{ student.phone or '' }}">
+      </div>
+      <div class="form-group">
+        <label for="dob">Date of Birth</label>
+        <input type="date" id="dob" name="dob" value="{{ student.dob or '' }}">
+      </div>
+      <div class="form-group">
+        <label for="photo">Change Photo</label>
+        <input type="file" id="photo" name="photo" accept="image/*">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{{ url_for('students') }}" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Update Student</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
